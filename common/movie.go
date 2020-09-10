@@ -4,28 +4,33 @@ import (
 	"fmt"
 	//"time"
 	"sort"
+
+	"gorm.io/gorm"
 )
 
 type Movie struct {
-	Id          int
+	gorm.Model
 	Name        string
-	Links       []string
+	Links       []*Link `gorm:"many2many:movies_links"`
 	Description string
 	Remarks     string
 	Duration    string
 	Rating      float32
 
-	CycleAdded   *Cycle
-	CycleWatched *Cycle
+	CycleAddedId   int
+	CycleAdded     *Cycle `gorm:"foreignKey:CycleAddedId"`
+	CycleWatchedId int
+	CycleWatched   *Cycle `gorm:"foreignKey:CycleWatchedId"`
 
 	Removed  bool // Removed by a mod or admin
 	Approved bool // Approved by a mod or admin (if required by config)
 
-	Votes []*Vote
-	Tags  []*Tag
+	Votes []*Vote `gorm:"foreignKey:MovieId"`
+	Tags  []*Tag  `gorm:"many2many:movies_tags"`
 
-	Poster  string // TODO: make this procedural
-	AddedBy *User
+	Poster    string // TODO: make this procedural
+	AddedById int
+	AddedBy   *User `gorm:"foreignKey:AddedById"`
 }
 
 func (m Movie) UserVoted(userId int) bool {
@@ -49,9 +54,9 @@ func (m Movie) String() string {
 	}
 
 	return fmt.Sprintf("Movie{Id:%d Name:%q Links:%s Description:%q Remarks:%s CycleAdded:%s CycleWatched:%s Duration:%s Rating:%f Votes:%s Tags:%s}",
-		m.Id,
+		m.ID,
 		m.Name,
-		m.Links,
+		// m.Links,
 		m.Description,
 		m.Remarks,
 		m.CycleAdded,

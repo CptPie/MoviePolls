@@ -1,6 +1,10 @@
 package common
 
+import (
+	"gorm.io/gorm"
+)
+
 type Tag struct {
-	Id   int
+	gorm.Model
 	Name string
 }

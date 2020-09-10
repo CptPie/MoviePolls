@@ -3,17 +3,19 @@ package common
 import (
 	"fmt"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type Cycle struct {
-	Id int
+	gorm.Model
 
 	PlannedEnd *time.Time
 	Ended      *time.Time
 
 	// List of movies watched this cycle.  If cycle has not ended, this will be
 	// nil.
-	Watched []*Movie
+	Watched []*Movie `gorm:"many2many:movies_cycles"`
 }
 
 func (c Cycle) PlannedEndString() string {
@@ -31,5 +33,5 @@ func (c Cycle) EndedString() string {
 }
 
 func (c Cycle) String() string {
-	return fmt.Sprintf("Cycle{Id:%d PlannedEnd:%s Ended: %s}", c.Id, c.PlannedEndString(), c.EndedString())
+	return fmt.Sprintf("Cycle{Id:%d PlannedEnd:%s Ended: %s}", c.ID, c.PlannedEndString(), c.EndedString())
 }

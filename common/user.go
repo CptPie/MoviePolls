@@ -3,6 +3,8 @@ package common
 import (
 	"fmt"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type PrivilegeLevel int
@@ -14,6 +16,7 @@ const (
 )
 
 type User struct {
+	gorm.Model
 	Id         int
 	Name       string
 	Password   string
