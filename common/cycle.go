@@ -15,7 +15,7 @@ type Cycle struct {
 
 	// List of movies watched this cycle.  If cycle has not ended, this will be
 	// nil.
-	Watched []*Movie `gorm:"many2many:movies_cycles"`
+	Watched []*Movie `gorm:"many2many:movies_cycles_watched"`
 }
 
 func (c Cycle) PlannedEndString() string {

@@ -19,8 +19,7 @@ type Movie struct {
 
 	CycleAddedId int
 	CycleAdded   *Cycle `gorm:"foreignKey:CycleAddedId"`
-	// CycleWatchedId int
-	// CycleWatched   *Cycle `gorm:"foreignKey:CycleWatchedId"`
+	Watched bool // Movie has been watched
 
 	Removed  bool // Removed by a mod or admin
 	Approved bool // Approved by a mod or admin (if required by config)
@@ -53,14 +52,14 @@ func (m Movie) String() string {
 		tags = append(tags, t.Name)
 	}
 
-	return fmt.Sprintf("Movie{Id:%d Name:%q Links:%v Description:%q Remarks:%s CycleAdded:%s CycleWatched:%s Duration:%s Rating:%f Votes:%s Tags:%s}",
+	return fmt.Sprintf("Movie{Id:%d Name:%q Links:%v Description:%q Remarks:%s CycleAdded:%s Watched:%b Duration:%s Rating:%f Votes:%s Tags:%s}",
 		m.ID,
 		m.Name,
 		m.Links,
 		m.Description,
 		m.Remarks,
 		m.CycleAdded,
-		// m.CycleWatched,
+		m.Watched,
 		m.Duration,
 		m.Rating,
 		votes,
