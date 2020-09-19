@@ -17,10 +17,10 @@ type Movie struct {
 	Duration    string
 	Rating      float32
 
-	CycleAddedId   int
-	CycleAdded     *Cycle `gorm:"foreignKey:CycleAddedId"`
-	CycleWatchedId int
-	CycleWatched   *Cycle `gorm:"foreignKey:CycleWatchedId"`
+	CycleAddedId int
+	CycleAdded   *Cycle `gorm:"foreignKey:CycleAddedId"`
+	// CycleWatchedId int
+	// CycleWatched   *Cycle `gorm:"foreignKey:CycleWatchedId"`
 
 	Removed  bool // Removed by a mod or admin
 	Approved bool // Approved by a mod or admin (if required by config)
@@ -35,7 +35,7 @@ type Movie struct {
 
 func (m Movie) UserVoted(userId int) bool {
 	for _, v := range m.Votes {
-		if v.User.Id == userId {
+		if int(v.User.ID) == userId {
 			return true
 		}
 	}
@@ -53,14 +53,14 @@ func (m Movie) String() string {
 		tags = append(tags, t.Name)
 	}
 
-	return fmt.Sprintf("Movie{Id:%d Name:%q Links:%s Description:%q Remarks:%s CycleAdded:%s CycleWatched:%s Duration:%s Rating:%f Votes:%s Tags:%s}",
+	return fmt.Sprintf("Movie{Id:%d Name:%q Links:%v Description:%q Remarks:%s CycleAdded:%s CycleWatched:%s Duration:%s Rating:%f Votes:%s Tags:%s}",
 		m.ID,
 		m.Name,
-		// m.Links,
+		m.Links,
 		m.Description,
 		m.Remarks,
 		m.CycleAdded,
-		m.CycleWatched,
+		// m.CycleWatched,
 		m.Duration,
 		m.Rating,
 		votes,

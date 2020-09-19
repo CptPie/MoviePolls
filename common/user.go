@@ -17,7 +17,6 @@ const (
 
 type User struct {
 	gorm.Model
-	Id         int
 	Name       string
 	Password   string
 	OAuthToken string
@@ -56,7 +55,7 @@ func (u User) IsMod() bool {
 func (u User) String() string {
 	return fmt.Sprintf(
 		"User{Id:%d Name:%q Email:%q NotifyCycleEnd:%t NotifyVoteSelection:%t Privilege:%d PassDate:%s}",
-		u.Id,
+		u.ID,
 		u.Name,
 		u.Email,
 		u.NotifyCycleEnd,
