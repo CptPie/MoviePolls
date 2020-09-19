@@ -112,7 +112,7 @@ func main() {
 	id := db.Create(&movie)
 
 	var found_movie common.Movie
-	db.Preload("Tags").Preload("Links").Preload("AddedBy").Find(&found_movie, id)
+	db.Preload("Tags").Preload("Links").Preload("AddedBy").Preload("CycleAdded").Find(&found_movie, id)
 	fmt.Printf("%v\n", found_movie)
 
 }
