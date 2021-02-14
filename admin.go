@@ -21,7 +21,7 @@ func (s *Server) checkAdminRights(w http.ResponseWriter, r *http.Request) bool {
 	user := s.getSessionUser(w, r)
 
 	ok := true
-	if user == nil || user.Privilege < common.PRIV_MOD {
+	if user == nil || user.Privilege < common.PRIV_ADMIN {
 		ok = false
 	}
 
@@ -37,8 +37,28 @@ func (s *Server) checkAdminRights(w http.ResponseWriter, r *http.Request) bool {
 	return true
 }
 
+func (s *Server) checkModRights(w http.ResponseWriter, r *http.Request) bool {
+	user := s.getSessionUser(w, r)
+
+	ok := true
+	if user == nil || user.Privilege < common.PRIV_ADMIN {
+		ok = false
+	}
+
+	if !ok {
+		if s.debug {
+			s.doError(http.StatusUnauthorized, "You are not a moderator.", w, r)
+			return false
+		}
+		s.doError(http.StatusNotFound, fmt.Sprintf("%q not found", r.URL.Path), w, r)
+		return false
+	}
+
+	return true
+}
+
 func (s *Server) handlerAdmin(w http.ResponseWriter, r *http.Request) {
-	if !s.checkAdminRights(w, r) {
+	if !s.checkAdminRights(w, r) || !s.checkModRights(w, r) {
 		return
 	}
 
@@ -60,7 +80,7 @@ func (s *Server) handlerAdmin(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handlerAdminUsers(w http.ResponseWriter, r *http.Request) {
-	if !s.checkAdminRights(w, r) {
+	if !s.checkAdminRights(w, r) || !s.checkModRights(w, r) {
 		return
 	}
 
@@ -586,7 +606,7 @@ func (s *Server) handlerAdminConfig(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handlerAdminMovieEdit(w http.ResponseWriter, r *http.Request) {
-	if !s.checkAdminRights(w, r) {
+	if !s.checkAdminRights(w, r) || !s.checkModRights(w, r) {
 		return
 	}
 
@@ -723,7 +743,7 @@ func (s *Server) handlerAdminMovieEdit(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handlerAdminMovies(w http.ResponseWriter, r *http.Request) {
-	if !s.checkAdminRights(w, r) {
+	if !s.checkAdminRights(w, r) || !s.checkModRights(w, r) {
 		return
 	}
 
@@ -766,7 +786,7 @@ func (s *Server) handlerAdminMovies(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handlerAdminCycles_Post(w http.ResponseWriter, r *http.Request) {
-	if !s.checkAdminRights(w, r) {
+	if !s.checkAdminRights(w, r) || !s.checkModRights(w, r) {
 		return
 	}
 
@@ -847,7 +867,7 @@ func (s *Server) handlerAdminCycles_Post(w http.ResponseWriter, r *http.Request)
 }
 
 func (s *Server) handlerAdminCycles(w http.ResponseWriter, r *http.Request) {
-	if !s.checkAdminRights(w, r) {
+	if !s.checkAdminRights(w, r) || !s.checkModRights(w, r) {
 		return
 	}
 

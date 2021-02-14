@@ -10,6 +10,23 @@
             {{end}}
     </div>
 
+     <div>
+            <div class="sectionTitle">Change user roles</div>
+            {{ if .User.Priviledge eq 0 }} <!-- is a normal user --> 
+            <a href="/admin/user/{{.User.Id}}?action=moderator">Promote user to moderator</a>
+            <a href="/admin/user/{{.User.Id}}?action=admin">Promote user to admin</a>
+            {{ elif .User.Priviledge eq 1 }} <!-- is a moderator -->
+            <a href="/admin/user/{{.User.Id}}?action=del_moderator">Remove moderator role from user</a>
+            {{ else }} <!-- is an admin -->
+            <a href="/admin/user/{{.User.Id}}?action=del_admin">Remove admin role from user</a>
+            {{ end }}
+    </div>
+ 
+     <div>
+            <div class="sectionTitle">Change password</div>
+            {{end}}
+    </div>
+
     <div>
         <form method="POST" action="/admin/user/{{.User.Id}}">
             <input type="hidden" name="Form" value="Notifications" />
