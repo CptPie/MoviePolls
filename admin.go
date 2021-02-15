@@ -245,6 +245,246 @@ func (s *Server) adminPurgeUser(w http.ResponseWriter, r *http.Request, user *co
 	}
 }
 
+func (s *Server) adminAddAdmin(w http.ResponseWriter, r *http.Request, user *common.User) {
+	confirm := r.URL.Query().Get("confirm")
+	if confirm == "yes" {
+		s.l.Info("Promoting user %s to admin", user.Name)
+
+		user.Privilege = common.PRIV_ADMIN
+
+		err := s.data.UpdateUser(user)
+
+		if err != nil {
+			s.doError(
+				http.StatusBadRequest,
+				fmt.Sprintf("Unable to promote user: %v", err),
+				w, r)
+			return
+		}
+
+		data := struct {
+			dataPageBase
+
+			Message  string
+			Link     string
+			LinkText string
+		}{
+			dataPageBase: s.newPageBase("Admin - Promote User to admin", w, r),
+
+			Message:  fmt.Sprintf("The user %q has been promoted to admin.", user.Name),
+			Link:     "/admin/users",
+			LinkText: "Ok",
+		}
+
+		if err := s.executeTemplate(w, "adminNotice", data); err != nil {
+			s.l.Error("Error rendering template: %v", err)
+		}
+		return
+	}
+
+	s.l.Info("Confirm promoting user %s to admin", user.Name)
+	data := struct {
+		dataPageBase
+
+		Message      string
+		TrueMessage  string
+		FalseMessage string
+		TrueLink     string
+		FalseLink    string
+	}{
+		dataPageBase: s.newPageBase("Admin - Promote User to admin", w, r),
+		Message:      fmt.Sprintf("Are you sure you want to promote the account of %q to admin?", user.Name),
+		TrueMessage:  "Yes",
+		FalseMessage: "Cancel",
+		TrueLink:     fmt.Sprintf("/admin/user/%d?action=add_admin&confirm=yes", user.Id),
+		FalseLink:    "/admin/users",
+	}
+
+	if err := s.executeTemplate(w, "adminConfirm", data); err != nil {
+		s.l.Error("Error rendering template: %v", err)
+	}
+}
+
+func (s *Server) adminAddModerator(w http.ResponseWriter, r *http.Request, user *common.User) {
+	confirm := r.URL.Query().Get("confirm")
+	if confirm == "yes" {
+		s.l.Info("Promoting user %s to moderator", user.Name)
+
+		user.Privilege = common.PRIV_MOD
+
+		err := s.data.UpdateUser(user)
+
+		if err != nil {
+			s.doError(
+				http.StatusBadRequest,
+				fmt.Sprintf("Unable to promote user: %v", err),
+				w, r)
+			return
+		}
+
+		data := struct {
+			dataPageBase
+
+			Message  string
+			Link     string
+			LinkText string
+		}{
+			dataPageBase: s.newPageBase("Admin - Promote User to moderator", w, r),
+
+			Message:  fmt.Sprintf("The user %q has been promoted to moderator.", user.Name),
+			Link:     "/admin/users",
+			LinkText: "Ok",
+		}
+
+		if err := s.executeTemplate(w, "adminNotice", data); err != nil {
+			s.l.Error("Error rendering template: %v", err)
+		}
+		return
+	}
+
+	s.l.Info("Confirm promoting user %s to moderator", user.Name)
+	data := struct {
+		dataPageBase
+
+		Message      string
+		TrueMessage  string
+		FalseMessage string
+		TrueLink     string
+		FalseLink    string
+	}{
+		dataPageBase: s.newPageBase("Admin - Promote User to moderator", w, r),
+		Message:      fmt.Sprintf("Are you sure you want to promote the account of %q to moderator?", user.Name),
+		TrueMessage:  "Yes",
+		FalseMessage: "Cancel",
+		TrueLink:     fmt.Sprintf("/admin/user/%d?action=add_moderator&confirm=yes", user.Id),
+		FalseLink:    "/admin/users",
+	}
+
+	if err := s.executeTemplate(w, "adminConfirm", data); err != nil {
+		s.l.Error("Error rendering template: %v", err)
+	}
+}
+
+func (s *Server) adminDelAdmin(w http.ResponseWriter, r *http.Request, user *common.User) {
+	confirm := r.URL.Query().Get("confirm")
+	if confirm == "yes" {
+		s.l.Info("Removing admin role from user %s", user.Name)
+
+		user.Privilege = common.PRIV_USER
+
+		err := s.data.UpdateUser(user)
+
+		if err != nil {
+			s.doError(
+				http.StatusBadRequest,
+				fmt.Sprintf("Unable to demote user: %v", err),
+				w, r)
+			return
+		}
+
+		data := struct {
+			dataPageBase
+
+			Message  string
+			Link     string
+			LinkText string
+		}{
+			dataPageBase: s.newPageBase("Admin - Remove role from admin", w, r),
+
+			Message:  fmt.Sprintf("The user %q has been demoted.", user.Name),
+			Link:     "/admin/users",
+			LinkText: "Ok",
+		}
+
+		if err := s.executeTemplate(w, "adminNotice", data); err != nil {
+			s.l.Error("Error rendering template: %v", err)
+		}
+		return
+	}
+
+	s.l.Info("Confirm removing the admin role from user %s", user.Name)
+	data := struct {
+		dataPageBase
+
+		Message      string
+		TrueMessage  string
+		FalseMessage string
+		TrueLink     string
+		FalseLink    string
+	}{
+		dataPageBase: s.newPageBase("Admin - Remove role from admin", w, r),
+		Message:      fmt.Sprintf("Are you sure you want to remove the role of admin from %q?", user.Name),
+		TrueMessage:  "Yes",
+		FalseMessage: "Cancel",
+		TrueLink:     fmt.Sprintf("/admin/user/%d?action=del_admin&confirm=yes", user.Id),
+		FalseLink:    "/admin/users",
+	}
+
+	if err := s.executeTemplate(w, "adminConfirm", data); err != nil {
+		s.l.Error("Error rendering template: %v", err)
+	}
+}
+
+func (s *Server) adminDelModerator(w http.ResponseWriter, r *http.Request, user *common.User) {
+	confirm := r.URL.Query().Get("confirm")
+	if confirm == "yes" {
+		s.l.Info("Removing moderator role from user %s", user.Name)
+
+		user.Privilege = common.PRIV_USER
+
+		err := s.data.UpdateUser(user)
+
+		if err != nil {
+			s.doError(
+				http.StatusBadRequest,
+				fmt.Sprintf("Unable to demote user: %v", err),
+				w, r)
+			return
+		}
+
+		data := struct {
+			dataPageBase
+
+			Message  string
+			Link     string
+			LinkText string
+		}{
+			dataPageBase: s.newPageBase("Admin - Remove role from moderator", w, r),
+
+			Message:  fmt.Sprintf("The user %q has been demoted.", user.Name),
+			Link:     "/admin/users",
+			LinkText: "Ok",
+		}
+
+		if err := s.executeTemplate(w, "adminNotice", data); err != nil {
+			s.l.Error("Error rendering template: %v", err)
+		}
+		return
+	}
+
+	s.l.Info("Confirm removing the moderator role from user %s", user.Name)
+	data := struct {
+		dataPageBase
+
+		Message      string
+		TrueMessage  string
+		FalseMessage string
+		TrueLink     string
+		FalseLink    string
+	}{
+		dataPageBase: s.newPageBase("Admin - Remove role from moderator", w, r),
+		Message:      fmt.Sprintf("Are you sure you want to remove the role of moderator from %q?", user.Name),
+		TrueMessage:  "Yes",
+		FalseMessage: "Cancel",
+		TrueLink:     fmt.Sprintf("/admin/user/%d?action=del_moderator&confirm=yes", user.Id),
+		FalseLink:    "/admin/users",
+	}
+
+	if err := s.executeTemplate(w, "adminConfirm", data); err != nil {
+		s.l.Error("Error rendering template: %v", err)
+	}
+}
+
 func (s *Server) handlerAdminUserEdit(w http.ResponseWriter, r *http.Request) {
 	if !s.checkAdminRights(w, r) {
 		return
@@ -296,6 +536,18 @@ func (s *Server) handlerAdminUserEdit(w http.ResponseWriter, r *http.Request) {
 
 		s.l.Debug("Saving new urlKey with URL %s", urlKey.Url)
 		s.urlKeys[urlKey.Url] = urlKey
+	case "add_admin":
+		s.adminAddAdmin(w, r, user)
+		return
+	case "add_moderator":
+		s.adminAddModerator(w, r, user)
+		return
+	case "del_admin":
+		s.adminDelAdmin(w, r, user)
+		return
+	case "del_moderator":
+		s.adminDelModerator(w, r, user)
+		return
 	}
 
 	totalVotes, err := s.data.GetCfgInt("MaxUserVotes", DefaultMaxUserVotes)
