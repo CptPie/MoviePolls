@@ -30,7 +30,6 @@ func (s *Server) checkAdminRights(w http.ResponseWriter, r *http.Request) bool {
 			s.doError(http.StatusUnauthorized, "You are not an admin.", w, r)
 			return false
 		}
-		s.doError(http.StatusNotFound, fmt.Sprintf("%q not found", r.URL.Path), w, r)
 		return false
 	}
 
@@ -41,7 +40,7 @@ func (s *Server) checkModRights(w http.ResponseWriter, r *http.Request) bool {
 	user := s.getSessionUser(w, r)
 
 	ok := true
-	if user == nil || user.Privilege < common.PRIV_ADMIN {
+	if user == nil || user.Privilege < common.PRIV_MOD {
 		ok = false
 	}
 
@@ -50,7 +49,6 @@ func (s *Server) checkModRights(w http.ResponseWriter, r *http.Request) bool {
 			s.doError(http.StatusUnauthorized, "You are not a moderator.", w, r)
 			return false
 		}
-		s.doError(http.StatusNotFound, fmt.Sprintf("%q not found", r.URL.Path), w, r)
 		return false
 	}
 
@@ -58,7 +56,8 @@ func (s *Server) checkModRights(w http.ResponseWriter, r *http.Request) bool {
 }
 
 func (s *Server) handlerAdmin(w http.ResponseWriter, r *http.Request) {
-	if !s.checkAdminRights(w, r) || !s.checkModRights(w, r) {
+	if !(s.checkAdminRights(w, r) || s.checkModRights(w, r)) {
+		s.doError(http.StatusNotFound, fmt.Sprintf("%q not found", r.URL.Path), w, r)
 		return
 	}
 
@@ -80,7 +79,8 @@ func (s *Server) handlerAdmin(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handlerAdminUsers(w http.ResponseWriter, r *http.Request) {
-	if !s.checkAdminRights(w, r) || !s.checkModRights(w, r) {
+	if !(s.checkAdminRights(w, r) || s.checkModRights(w, r)) {
+		s.doError(http.StatusNotFound, fmt.Sprintf("%q not found", r.URL.Path), w, r)
 		return
 	}
 
@@ -487,6 +487,7 @@ func (s *Server) adminDelModerator(w http.ResponseWriter, r *http.Request, user 
 
 func (s *Server) handlerAdminUserEdit(w http.ResponseWriter, r *http.Request) {
 	if !s.checkAdminRights(w, r) {
+		s.doError(http.StatusNotFound, fmt.Sprintf("%q not found", r.URL.Path), w, r)
 		return
 	}
 
@@ -620,6 +621,7 @@ const (
 
 func (s *Server) handlerAdminConfig(w http.ResponseWriter, r *http.Request) {
 	if !s.checkAdminRights(w, r) {
+		s.doError(http.StatusNotFound, fmt.Sprintf("%q not found", r.URL.Path), w, r)
 		return
 	}
 
@@ -858,7 +860,8 @@ func (s *Server) handlerAdminConfig(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handlerAdminMovieEdit(w http.ResponseWriter, r *http.Request) {
-	if !s.checkAdminRights(w, r) || !s.checkModRights(w, r) {
+	if !(s.checkAdminRights(w, r) || s.checkModRights(w, r)) {
+		s.doError(http.StatusNotFound, fmt.Sprintf("%q not found", r.URL.Path), w, r)
 		return
 	}
 
@@ -995,7 +998,8 @@ func (s *Server) handlerAdminMovieEdit(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handlerAdminMovies(w http.ResponseWriter, r *http.Request) {
-	if !s.checkAdminRights(w, r) || !s.checkModRights(w, r) {
+	if !(s.checkAdminRights(w, r) || s.checkModRights(w, r)) {
+		s.doError(http.StatusNotFound, fmt.Sprintf("%q not found", r.URL.Path), w, r)
 		return
 	}
 
@@ -1038,7 +1042,8 @@ func (s *Server) handlerAdminMovies(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handlerAdminCycles_Post(w http.ResponseWriter, r *http.Request) {
-	if !s.checkAdminRights(w, r) || !s.checkModRights(w, r) {
+	if !(s.checkAdminRights(w, r) || s.checkModRights(w, r)) {
+		s.doError(http.StatusNotFound, fmt.Sprintf("%q not found", r.URL.Path), w, r)
 		return
 	}
 
@@ -1119,7 +1124,8 @@ func (s *Server) handlerAdminCycles_Post(w http.ResponseWriter, r *http.Request)
 }
 
 func (s *Server) handlerAdminCycles(w http.ResponseWriter, r *http.Request) {
-	if !s.checkAdminRights(w, r) || !s.checkModRights(w, r) {
+	if !(s.checkAdminRights(w, r) || s.checkModRights(w, r)) {
+		s.doError(http.StatusNotFound, fmt.Sprintf("%q not found", r.URL.Path), w, r)
 		return
 	}
 
