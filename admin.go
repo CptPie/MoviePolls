@@ -14,6 +14,7 @@ import (
 type dataAdminHome struct {
 	dataPageBase
 
+	Actor *common.User
 	Cycle *common.Cycle
 }
 
@@ -70,6 +71,7 @@ func (s *Server) handlerAdmin(w http.ResponseWriter, r *http.Request) {
 	data := dataAdminHome{
 		dataPageBase: s.newPageBase("Admin", w, r),
 
+		Actor: s.getSessionUser(w, r),
 		Cycle: cycle,
 	}
 
@@ -97,9 +99,11 @@ func (s *Server) handlerAdminUsers(w http.ResponseWriter, r *http.Request) {
 		dataPageBase
 
 		Users []*common.User
+		Actor *common.User
 	}{
 		dataPageBase: s.newPageBase("Admin - Users", w, r),
 		Users:        ulist,
+		Actor:        s.getSessionUser(w, r),
 	}
 
 	if err := s.executeTemplate(w, "adminUsers", data); err != nil {
@@ -139,12 +143,14 @@ func (s *Server) adminDeleteUser(w http.ResponseWriter, r *http.Request, user *c
 			Message  string
 			Link     string
 			LinkText string
+			Actor    *common.User
 		}{
 			dataPageBase: s.newPageBase("Admin - Delete User", w, r),
 
 			Message:  fmt.Sprintf("The user %q has been removed.", origName),
 			Link:     "/admin/users",
 			LinkText: "Ok",
+			Actor:    s.getSessionUser(w, r),
 		}
 
 		if err := s.executeTemplate(w, "adminNotice", data); err != nil {
@@ -163,6 +169,7 @@ func (s *Server) adminDeleteUser(w http.ResponseWriter, r *http.Request, user *c
 		FalseMessage string
 		TrueLink     string
 		FalseLink    string
+		Actor        *common.User
 	}{
 		dataPageBase: s.newPageBase("Admin - Delete User", w, r),
 		Message:      fmt.Sprintf("Are you sure you want to remove the account of %q?  Its votes will stay intact, but everything else will be cleared.", user.Name),
@@ -170,6 +177,7 @@ func (s *Server) adminDeleteUser(w http.ResponseWriter, r *http.Request, user *c
 		FalseMessage: "Cancel",
 		TrueLink:     fmt.Sprintf("/admin/user/%d?action=delete&confirm=yes", user.Id),
 		FalseLink:    "/admin/users",
+		Actor:        s.getSessionUser(w, r),
 	}
 
 	if err := s.executeTemplate(w, "adminConfirm", data); err != nil {
@@ -208,12 +216,14 @@ func (s *Server) adminPurgeUser(w http.ResponseWriter, r *http.Request, user *co
 			Message  string
 			Link     string
 			LinkText string
+			Actor    *common.User
 		}{
 			dataPageBase: s.newPageBase("Admin - Purge User", w, r),
 
 			Message:  fmt.Sprintf("The user %q has been purged.", origName),
 			Link:     "/admin/users",
 			LinkText: "Ok",
+			Actor:    s.getSessionUser(w, r),
 		}
 
 		if err := s.executeTemplate(w, "adminNotice", data); err != nil {
@@ -231,6 +241,7 @@ func (s *Server) adminPurgeUser(w http.ResponseWriter, r *http.Request, user *co
 		FalseMessage string
 		TrueLink     string
 		FalseLink    string
+		Actor        *common.User
 	}{
 		dataPageBase: s.newPageBase("Admin - Perge User", w, r),
 		Message:      fmt.Sprintf("Are you sure you want to PURGE the account of %q?  Votes will be deleted.", user.Name),
@@ -238,6 +249,7 @@ func (s *Server) adminPurgeUser(w http.ResponseWriter, r *http.Request, user *co
 		FalseMessage: "Cancel",
 		TrueLink:     fmt.Sprintf("/admin/user/%d?action=purge&confirm=yes", user.Id),
 		FalseLink:    "/admin/users",
+		Actor:        s.getSessionUser(w, r),
 	}
 
 	if err := s.executeTemplate(w, "adminConfirm", data); err != nil {
@@ -268,12 +280,14 @@ func (s *Server) adminAddAdmin(w http.ResponseWriter, r *http.Request, user *com
 			Message  string
 			Link     string
 			LinkText string
+			Actor    *common.User
 		}{
 			dataPageBase: s.newPageBase("Admin - Promote User to admin", w, r),
 
 			Message:  fmt.Sprintf("The user %q has been promoted to admin.", user.Name),
 			Link:     "/admin/users",
 			LinkText: "Ok",
+			Actor:    s.getSessionUser(w, r),
 		}
 
 		if err := s.executeTemplate(w, "adminNotice", data); err != nil {
@@ -291,6 +305,7 @@ func (s *Server) adminAddAdmin(w http.ResponseWriter, r *http.Request, user *com
 		FalseMessage string
 		TrueLink     string
 		FalseLink    string
+		Actor        *common.User
 	}{
 		dataPageBase: s.newPageBase("Admin - Promote User to admin", w, r),
 		Message:      fmt.Sprintf("Are you sure you want to promote the account of %q to admin?", user.Name),
@@ -298,6 +313,7 @@ func (s *Server) adminAddAdmin(w http.ResponseWriter, r *http.Request, user *com
 		FalseMessage: "Cancel",
 		TrueLink:     fmt.Sprintf("/admin/user/%d?action=add_admin&confirm=yes", user.Id),
 		FalseLink:    "/admin/users",
+		Actor:        s.getSessionUser(w, r),
 	}
 
 	if err := s.executeTemplate(w, "adminConfirm", data); err != nil {
@@ -328,12 +344,14 @@ func (s *Server) adminAddModerator(w http.ResponseWriter, r *http.Request, user 
 			Message  string
 			Link     string
 			LinkText string
+			Actor    *common.User
 		}{
 			dataPageBase: s.newPageBase("Admin - Promote User to moderator", w, r),
 
 			Message:  fmt.Sprintf("The user %q has been promoted to moderator.", user.Name),
 			Link:     "/admin/users",
 			LinkText: "Ok",
+			Actor:    s.getSessionUser(w, r),
 		}
 
 		if err := s.executeTemplate(w, "adminNotice", data); err != nil {
@@ -351,6 +369,7 @@ func (s *Server) adminAddModerator(w http.ResponseWriter, r *http.Request, user 
 		FalseMessage string
 		TrueLink     string
 		FalseLink    string
+		Actor        *common.User
 	}{
 		dataPageBase: s.newPageBase("Admin - Promote User to moderator", w, r),
 		Message:      fmt.Sprintf("Are you sure you want to promote the account of %q to moderator?", user.Name),
@@ -358,6 +377,7 @@ func (s *Server) adminAddModerator(w http.ResponseWriter, r *http.Request, user 
 		FalseMessage: "Cancel",
 		TrueLink:     fmt.Sprintf("/admin/user/%d?action=add_moderator&confirm=yes", user.Id),
 		FalseLink:    "/admin/users",
+		Actor:        s.getSessionUser(w, r),
 	}
 
 	if err := s.executeTemplate(w, "adminConfirm", data); err != nil {
@@ -388,12 +408,14 @@ func (s *Server) adminDelAdmin(w http.ResponseWriter, r *http.Request, user *com
 			Message  string
 			Link     string
 			LinkText string
+			Actor    *common.User
 		}{
 			dataPageBase: s.newPageBase("Admin - Remove role from admin", w, r),
 
 			Message:  fmt.Sprintf("The user %q has been demoted.", user.Name),
 			Link:     "/admin/users",
 			LinkText: "Ok",
+			Actor:    s.getSessionUser(w, r),
 		}
 
 		if err := s.executeTemplate(w, "adminNotice", data); err != nil {
@@ -411,6 +433,7 @@ func (s *Server) adminDelAdmin(w http.ResponseWriter, r *http.Request, user *com
 		FalseMessage string
 		TrueLink     string
 		FalseLink    string
+		Actor        *common.User
 	}{
 		dataPageBase: s.newPageBase("Admin - Remove role from admin", w, r),
 		Message:      fmt.Sprintf("Are you sure you want to remove the role of admin from %q?", user.Name),
@@ -418,6 +441,7 @@ func (s *Server) adminDelAdmin(w http.ResponseWriter, r *http.Request, user *com
 		FalseMessage: "Cancel",
 		TrueLink:     fmt.Sprintf("/admin/user/%d?action=del_admin&confirm=yes", user.Id),
 		FalseLink:    "/admin/users",
+		Actor:        s.getSessionUser(w, r),
 	}
 
 	if err := s.executeTemplate(w, "adminConfirm", data); err != nil {
@@ -448,12 +472,14 @@ func (s *Server) adminDelModerator(w http.ResponseWriter, r *http.Request, user 
 			Message  string
 			Link     string
 			LinkText string
+			Actor    *common.User
 		}{
 			dataPageBase: s.newPageBase("Admin - Remove role from moderator", w, r),
 
 			Message:  fmt.Sprintf("The user %q has been demoted.", user.Name),
 			Link:     "/admin/users",
 			LinkText: "Ok",
+			Actor:    s.getSessionUser(w, r),
 		}
 
 		if err := s.executeTemplate(w, "adminNotice", data); err != nil {
@@ -471,6 +497,7 @@ func (s *Server) adminDelModerator(w http.ResponseWriter, r *http.Request, user 
 		FalseMessage string
 		TrueLink     string
 		FalseLink    string
+		Actor        *common.User
 	}{
 		dataPageBase: s.newPageBase("Admin - Remove role from moderator", w, r),
 		Message:      fmt.Sprintf("Are you sure you want to remove the role of moderator from %q?", user.Name),
@@ -478,6 +505,7 @@ func (s *Server) adminDelModerator(w http.ResponseWriter, r *http.Request, user 
 		FalseMessage: "Cancel",
 		TrueLink:     fmt.Sprintf("/admin/user/%d?action=del_moderator&confirm=yes", user.Id),
 		FalseLink:    "/admin/users",
+		Actor:        s.getSessionUser(w, r),
 	}
 
 	if err := s.executeTemplate(w, "adminConfirm", data); err != nil {
@@ -582,6 +610,7 @@ func (s *Server) handlerAdminUserEdit(w http.ResponseWriter, r *http.Request) {
 		NotifyError []string
 		UrlKey      *common.UrlKey
 		Host        string
+		Actor       *common.User
 	}{
 		dataPageBase: s.newPageBase("Admin - User Edit", w, r),
 
@@ -591,6 +620,7 @@ func (s *Server) handlerAdminUserEdit(w http.ResponseWriter, r *http.Request) {
 		AvailableVotes: totalVotes - len(activeVotes),
 		UrlKey:         urlKey,
 		Host:           host,
+		Actor:          s.getSessionUser(w, r),
 	}
 
 	// FIXME: implement this
@@ -635,6 +665,7 @@ func (s *Server) handlerAdminConfig(w http.ResponseWriter, r *http.Request) {
 		TypeBool   ConfigValueType
 		TypeInt    ConfigValueType
 		TypeKey    ConfigValueType
+		Actor      *common.User
 	}{
 		ErrorMessage: []string{},
 		Values: []configValue{
@@ -683,6 +714,7 @@ func (s *Server) handlerAdminConfig(w http.ResponseWriter, r *http.Request) {
 		TypeBool:   ConfigBool,
 		TypeInt:    ConfigInt,
 		TypeKey:    ConfigKey,
+		Actor:      s.getSessionUser(w, r),
 	}
 
 	var err error
@@ -986,10 +1018,12 @@ func (s *Server) handlerAdminMovieEdit(w http.ResponseWriter, r *http.Request) {
 		dataPageBase
 		Movie    *common.Movie
 		LinkText string
+		Actor    *common.User
 	}{
 		dataPageBase: s.newPageBase("Admin - Movies", w, r),
 		Movie:        movie,
 		LinkText:     linktext,
+		Actor:        s.getSessionUser(w, r),
 	}
 
 	if err := s.executeTemplate(w, "adminMovieEdit", data); err != nil {
@@ -1028,12 +1062,14 @@ func (s *Server) handlerAdminMovies(w http.ResponseWriter, r *http.Request) {
 		Pending []*common.Movie
 
 		RequireApproval bool
+		Actor           *common.User
 	}{
 		dataPageBase: s.newPageBase("Admin - Movies", w, r),
 		Active:       common.SortMoviesByName(active),
 		//Pending:      common.SortMoviesByName(active),
 
 		RequireApproval: approval,
+		Actor:           s.getSessionUser(w, r),
 	}
 
 	if err := s.executeTemplate(w, "adminMovies", data); err != nil {
@@ -1175,11 +1211,13 @@ func (s *Server) handlerAdminCycles(w http.ResponseWriter, r *http.Request) {
 		dataPageBase
 		Cycle *common.Cycle
 		Past  []*common.Cycle
+		Actor *common.User
 	}{
 		dataPageBase: s.newPageBase("Admin - Cycles", w, r),
 
 		Cycle: cycle,
 		Past:  []*common.Cycle{},
+		Actor: s.getSessionUser(w, r),
 	}
 
 	pastCycles, err := s.data.GetPastCycles(0, 5)
@@ -1235,11 +1273,13 @@ func (s *Server) cycleStage1(w http.ResponseWriter, r *http.Request) {
 
 		Movies []*common.Movie
 		Stage  int
+		Actor  *common.User
 	}{
 		dataPageBase: s.newPageBase("Admin - End Cycle", w, r),
 
 		Movies: common.SortMoviesByVotes(movies),
 		Stage:  1,
+		Actor:  s.getSessionUser(w, r),
 	}
 
 	if err := s.executeTemplate(w, "adminEndCycle", data); err != nil {

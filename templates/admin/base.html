@@ -44,7 +44,11 @@ Admin page.
         <a href="/admin/users">Users</a>
         <a href="/admin/movies">Movies</a>
         <a href="/admin/cycles">Cycles</a>
+        {{ if .Actor }}
+        {{ if .Actor.CheckPriv "ADMIN" }}
         <a href="/admin/config">Config</a>
+        {{ end }}
+        {{ end }}
     </div>
     {{template "adminbody" .}}
 </div>
